@@ -1,0 +1,15 @@
+# Python virtual environments
+.venv/
+venv/
+AppleGame_venv/
+
+# Byte-code files
+*.pyc
+__pycache__/
+
+# IDE-specific files
+.idea/  # For PyCharm
+.vscode/ # For VS Code (if you use it)
+
+# Operating System files
+.DS_Store # macOS specific
