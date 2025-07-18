@@ -20,6 +20,8 @@ class Apple:
 # variables
 speed = 3
 score = 0
+timer = 60.0  # 60 seconds timer
+game_over = False
 
 # constants
 TILESIZE = 32
@@ -56,27 +58,36 @@ running = True
 def update():
     global speed
     global score
+    global timer
+    global game_over
 
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT]:
-        player_rect.x -= 8
-    elif keys[pygame.K_RIGHT]:
-        player_rect.x += 8
+    if not game_over:
+        # Update timer
+        timer -= 1/60  # Decrease by 1/60 second each frame (60 FPS)
+        if timer <= 0:
+            timer = 0
+            game_over = True
 
-    # apple management
-    for apple in apples:
-        apple.move()
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            player_rect.x -= 8
+        elif keys[pygame.K_RIGHT]:
+            player_rect.x += 8
 
-        if apple.rect.colliderect(floor_rect):
-            apples.remove(apple)
-            apples.append(Apple(apple_image, (random.randint(50,300), -50),speed))
+        # apple management
+        for apple in apples:
+            apple.move()
 
-        elif apple.rect.colliderect(player_rect):
-            apples.remove(apple)
-            apples.append(Apple(apple_image, (random.randint(50,300), -50),speed))
-            speed += 0.1
-            score += 1
-            pickup.play()
+            if apple.rect.colliderect(floor_rect):
+                apples.remove(apple)
+                apples.append(Apple(apple_image, (random.randint(50,300), -50),speed))
+
+            elif apple.rect.colliderect(player_rect):
+                apples.remove(apple)
+                apples.append(Apple(apple_image, (random.randint(50,300), -50),speed))
+                speed += 0.1
+                score += 1
+                pickup.play()
 
 
 
@@ -90,6 +101,20 @@ def draw():
 
     score_text = font.render(f"Score: {score}", True, 'white')
     screen.blit(score_text, (5, 5))
+    
+    # Display timer
+    timer_text = font.render(f"Time: {int(timer)}", True, 'white')
+    screen.blit(timer_text, (5, 35))
+    
+    # Display game over message
+    if game_over:
+        game_over_text = font.render("GAME OVER!", True, 'red')
+        text_rect = game_over_text.get_rect(center=(screen.get_width()/2, screen.get_height()/2))
+        screen.blit(game_over_text, text_rect)
+        
+        final_score_text = font.render(f"Final Score: {score}", True, 'red')
+        score_rect = final_score_text.get_rect(center=(screen.get_width()/2, screen.get_height()/2 + 30))
+        screen.blit(final_score_text, score_rect)
 
 # game loop
 while running:
@@ -100,7 +125,6 @@ while running:
 
     update()
     draw()
-
 
 
     clock.tick(60)
